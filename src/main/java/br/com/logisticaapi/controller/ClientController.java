@@ -35,7 +35,7 @@ public class ClientController {
 	}
 
 	@GetMapping
-	public List<Client> getClients(@PathVariable Long clientId) {
+	public List<Client> getClients() {
 		return repository.findAll();
 	}
 	
@@ -52,7 +52,7 @@ public class ClientController {
 	}
 	
 	@PutMapping("/{clientId}")
-	public ResponseEntity<Client> update(@Valid @RequestBody Long clientId, @Valid @RequestBody Client client) {
+	public ResponseEntity<Client> update(@PathVariable Long clientId, @Valid @RequestBody Client client) {
 		if (!repository.existsById(clientId)) {
 			return ResponseEntity.notFound().build();
 		}

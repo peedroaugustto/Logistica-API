@@ -14,8 +14,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import br.com.logisticaapi.domain.exceptions.BussinesException;
 
 @ControllerAdvice
 public class ApiException extends ResponseEntityExceptionHandler{
@@ -42,7 +45,19 @@ public class ApiException extends ResponseEntityExceptionHandler{
 		error.setTitle("Campos Invalidos");
 		error.setCampos(campos);
 		
-		return handleExceptionInternal(ex, "", headers, status, request);
+		return handleExceptionInternal(ex, error, headers, status, request);
+	}
+	
+	@ExceptionHandler(BussinesException.class)
+	public ResponseEntity<Object> handleBussinesException(BussinesException ex, WebRequest request){
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+
+		ErrorBody error = new ErrorBody();
+		error.setStatus(status.value());
+		error.setDateHour(LocalDateTime.now());
+		error.setTitle(ex.getMessage());
+		
+		return handleExceptionInternal(ex,error,new HttpHeaders(),status,request);
 	}
 	
 }
