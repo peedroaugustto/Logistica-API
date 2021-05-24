@@ -1,32 +1,14 @@
-package br.com.logisticaapi.domain.model;
+package br.com.logisticaapi.api.model;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
-
-@Embeddable
-public class Destiny {
+public class DestinyModel {
 
 	
-	@NotNull
-	@Column(name = "destiny_name")
 	private String name;
-	
-	@NotNull
-	@Column(name = "destiny_street")
 	private String street;
-	
-	@NotNull
-	@Column(name = "destiny_number")
 	private String number;
-	
-	@NotNull
-	@Column(name = "destiny_complement")
 	private String complement;
-	
-	@NotNull
-	@Column(name = "destiny_neighborhood")
 	private String neighborhood;
+	
 	
 	public String getName() {
 		return name;

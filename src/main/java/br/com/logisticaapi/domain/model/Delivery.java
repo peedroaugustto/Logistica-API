@@ -1,8 +1,11 @@
 package br.com.logisticaapi.domain.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,7 +14,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import br.com.logisticaapi.domain.exceptions.BussinesException;
 
 @Entity
 @Table(name = "tb_delivery")
@@ -28,13 +34,15 @@ public class Delivery {
 	private Destiny destiny;
 	
 	
-	
 	private BigDecimal rate;
+	
+	@OneToMany(mappedBy = "delivery" , cascade = CascadeType.ALL)
+	private List<Occurrence> occurrences = new ArrayList<>();
 	
 	@Enumerated(EnumType.STRING)
 	private DeliveryStatus status;
-	private LocalDateTime orderDate;
-	private LocalDateTime endDate;
+	private OffsetDateTime orderDate;
+	private OffsetDateTime endDate;
 	
 	
 	public Long getId() {
@@ -67,19 +75,25 @@ public class Delivery {
 	public void setStatus(DeliveryStatus status) {
 		this.status = status;
 	}
-	public LocalDateTime getOrderDate() {
+	public OffsetDateTime getOrderDate() {
 		return orderDate;
 	}
-	public void setOrderDate(LocalDateTime orderDate) {
+	public void setOrderDate(OffsetDateTime orderDate) {
 		this.orderDate = orderDate;
 	}
-	public LocalDateTime getEndDate() {
+	public OffsetDateTime getEndDate() {
 		return endDate;
 	}
-	public void setEndDate(LocalDateTime endDate) {
+	public void setEndDate(OffsetDateTime endDate) {
 		this.endDate = endDate;
 	}
 	
+	public List<Occurrence> getOccurrences() {
+		return occurrences;
+	}
+	public void setOccurrences(List<Occurrence> occurrences) {
+		this.occurrences = occurrences;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -103,8 +117,26 @@ public class Delivery {
 			return false;
 		return true;
 	}
+	public Occurrence addOccurrence(String description) {
+		Occurrence occurrence = new Occurrence();
+		occurrence.setDescription(description);
+		occurrence.setRegisterDate(OffsetDateTime.now());
+		occurrence.setDelivery(this);
+		this.getOccurrences().add(occurrence);
+		return occurrence;
+	}
+	public void finish() {
+		if(!toBeFinished()) {
+			throw new BussinesException("Entrega não pode ser finalizada!!");
+		}
+		
+		setStatus(DeliveryStatus.FINISHED);
+		setEndDate(OffsetDateTime.now());
+	}
 	
-	
+	public boolean toBeFinished() {
+		return DeliveryStatus.PENDING.equals(getStatus());
+	}
 	
 	
 }

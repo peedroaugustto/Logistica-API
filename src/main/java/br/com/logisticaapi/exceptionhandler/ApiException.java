@@ -1,6 +1,6 @@
 package br.com.logisticaapi.exceptionhandler;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +19,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import br.com.logisticaapi.domain.exceptions.BussinesException;
+import br.com.logisticaapi.domain.exceptions.EntityNotFoundExceptions;
 
 @ControllerAdvice
 public class ApiException extends ResponseEntityExceptionHandler{
@@ -41,7 +42,7 @@ public class ApiException extends ResponseEntityExceptionHandler{
 		
 		ErrorBody error = new ErrorBody();
 		error.setStatus(status.value());
-		error.setDateHour(LocalDateTime.now());
+		error.setDateHour(OffsetDateTime.now());
 		error.setTitle("Campos Invalidos");
 		error.setCampos(campos);
 		
@@ -54,10 +55,22 @@ public class ApiException extends ResponseEntityExceptionHandler{
 
 		ErrorBody error = new ErrorBody();
 		error.setStatus(status.value());
-		error.setDateHour(LocalDateTime.now());
+		error.setDateHour(OffsetDateTime.now());
 		error.setTitle(ex.getMessage());
 		
 		return handleExceptionInternal(ex,error,new HttpHeaders(),status,request);
 	}
 	
+	
+	@ExceptionHandler(EntityNotFoundExceptions.class)
+	public ResponseEntity<Object> handleBussinesException(EntityNotFoundExceptions ex, WebRequest request){
+		HttpStatus status = HttpStatus.NOT_FOUND;
+
+		ErrorBody error = new ErrorBody();
+		error.setStatus(status.value());
+		error.setDateHour(OffsetDateTime.now());
+		error.setTitle(ex.getMessage());
+		
+		return handleExceptionInternal(ex,error,new HttpHeaders(),status,request);
+	}
 }
